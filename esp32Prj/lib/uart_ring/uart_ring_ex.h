@@ -4,6 +4,7 @@
 #include <uart_ring.h>
 #include <esp32_user_sever.h>
 #include <Arduino.h>
+#include <canvasAPI.h>
 
 extern uartRingParameterTypedef uartRingSerial1Param;
 

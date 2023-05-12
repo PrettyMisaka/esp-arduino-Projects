@@ -7,65 +7,39 @@ static void setCanvasSize(callBackFun_EventTypedef e){
     webHeight = e.intData[1];
     Web_CanvasSetSize();
 
-    char str_tmp[256];
-    sprintf(str_tmp,"ctx.fillStyle=\"%s\";ctx.fillRect(0,0,%d,%d);",e.stringData[0],webWidth,webHeight);
-    String tmpString = str_tmp;
-    Web_CanvasPushCmd(tmpString);
+    canvasAPI_draw.setFillColor(e.stringData[0]);
+    canvasAPI_draw.fillRect(0,0,webWidth,webHeight);
 }
 static void clearCanvas(callBackFun_EventTypedef e){
-    Web_CanvasClear();
+    canvasAPI_draw.clearCanvas();
 }
 static void setFillColor(callBackFun_EventTypedef e){
-    char str_tmp[256];
-    sprintf(str_tmp,"ctx.fillStyle=\"%s\";",e.stringData[0]);
-    String tmpString = str_tmp;
-    Web_CanvasPushCmd(tmpString);
+    canvasAPI_draw.setFillColor(e.stringData[0]);
 }
 static void setStrokeColor(callBackFun_EventTypedef e){
-    char str_tmp[256];
-    sprintf(str_tmp,"ctx.strokeStyle=\"%s\";",e.stringData[0]);
-    String tmpString = str_tmp;
-    Web_CanvasPushCmd(tmpString);
+    canvasAPI_draw.setStrokeColor(e.stringData[0]);
 }
 
 static void fillRect(callBackFun_EventTypedef e){
-    char str_tmp[256];
-    sprintf(str_tmp,"ctx.fillRect(%d,%d,%d,%d);",e.intData[0],e.intData[1],e.intData[2],e.intData[3]);
-    String tmpString = str_tmp;
-    Web_CanvasPushCmd(tmpString);
+    canvasAPI_draw.fillRect(e.intData[0],e.intData[1],e.intData[2],e.intData[3]);
 }
 static void strokeRect(callBackFun_EventTypedef e){
-    char str_tmp[256];
-    sprintf(str_tmp,"ctx.strokeRect(%d,%d,%d,%d);",e.intData[0],e.intData[1],e.intData[2],e.intData[3]);
-    String tmpString = str_tmp;
-    Web_CanvasPushCmd(tmpString);
+    canvasAPI_draw.strokeRect(e.intData[0],e.intData[1],e.intData[2],e.intData[3]);
 }
 static void clearRect(callBackFun_EventTypedef e){
-    char str_tmp[256];
-    sprintf(str_tmp,"ctx.clearRect(%d,%d,%d,%d);",e.intData[0],e.intData[1],e.intData[2],e.intData[3]);
-    String tmpString = str_tmp;
-    Web_CanvasPushCmd(tmpString);
+    canvasAPI_draw.clearRect(e.intData[0],e.intData[1],e.intData[2],e.intData[3]);
 }
 static void drawLine(callBackFun_EventTypedef e){
-    char str_tmp[256];
-    sprintf(str_tmp,"ctx.moveTo(%d, %d);ctx.lineTo(%d, %d);ctx.stroke();",e.intData[0],e.intData[1],e.intData[2],e.intData[3]);
-    String tmpString = str_tmp;
-    Web_CanvasPushCmd(tmpString);
+    canvasAPI_draw.drawLine(e.intData[0],e.intData[1],e.intData[2],e.intData[3]);
 }
 static void setFont(callBackFun_EventTypedef e){
-    char str_tmp[256];
-    sprintf(str_tmp,"ctx.font=\"%s %s\";",e.stringData[0],e.stringData[1]);
-    String tmpString = str_tmp;
-    Web_CanvasPushCmd(tmpString);
+    canvasAPI_draw.setFont(e.stringData[0],e.stringData[1]);
 }
 static void drawStr(callBackFun_EventTypedef e){
-    char str_tmp[256];
-    sprintf(str_tmp,"ctx.fillText(\"%s\",%d,%d);",e.stringData[0],e.intData[0],e.intData[1]);
-    String tmpString = str_tmp;
-    Web_CanvasPushCmd(tmpString);
+    canvasAPI_draw.drawStr(e.intData[0],e.intData[1],e.stringData[0]);
 }
 static void showCanvasCmd(callBackFun_EventTypedef e){
-    Web_ShowCanvasCmdCode();
+    canvasAPI_draw.showCanvasCmd();
 }
 static void setWebReFlashTime(callBackFun_EventTypedef e){
     Web_SetReFlashTime(e.intData[0]);

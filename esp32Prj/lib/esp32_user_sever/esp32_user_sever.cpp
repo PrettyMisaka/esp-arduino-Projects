@@ -1,6 +1,7 @@
 #include <esp32_user_sever.h>
 #include <WebServer.h>
 #include <Arduino.h>
+#include <canvasAPI.h>
 
 String htmlCode;
 String canvasCmdCode = "ctx.fillStyle=\"#888888\";ctx.fillRect(0,0,480,320);";
@@ -21,15 +22,6 @@ void userSeverInit(void){
     esp32_server.onNotFound(Web_handleNotFound);  //当请求的网络资源不在服务器的时候，执行函数 handleFound 
 }
 
-void Web_CanvasPushCmd(String cmdString){
-  canvasCmdCode += cmdString;
-}
-void Web_CanvasClear(void){
-  canvasCmdCode = "";
-}
-void Web_ShowCanvasCmdCode(void){
-  Serial.println(canvasCmdCode);
-}
 void Web_CanvasSetSize(void){
   char str_tmp[64];
   sprintf(str_tmp,"<canvas id=\"tutorial\" width=\"%d\" height=\"%d\"></canvas>", webWidth, webHeight);
@@ -66,7 +58,7 @@ void Web_handleRoot(void) {   //处理网站根目录“/”的访问请求
         var canvas = document.getElementById('tutorial');\
         if(!canvas.getContext) return;\
         var ctx = canvas.getContext(\"2d\");"
-        + canvasCmdCode +
+        + canvasAPI_draw.canvasCmdCode +
     "}\
     draw();\
     </script>\
