@@ -215,6 +215,12 @@ ring_state ringBuffHandleFun(uartRingParameterTypedef *uart_ring_param_P){
     int str_length = 0;
     int Separator_Cnt = 0;
     callBackFun_EventTypedef e;
+    for (int i = 0; i < RING_MAX_DATATYPE_LENGTH; i++){
+        e.intData[i] = 0;
+        e.floatData[i] = 0;
+        sprintf(e.stringData[i],"");
+    }
+    
     while (1)
     {
         if(strcmp(cmdString_tmp,(char*)uart_ring_param_P->cmdBuffArr[cmdBuffIndex_tmp].cmd_String) == 0){

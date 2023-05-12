@@ -15,7 +15,7 @@
 #define CMD_STRING_SAVE_MAX_LENGTH 30
 #define CMD_BUFF_LENGTH 30
 
-#define RING_MAX_DATATYPE_LENGTH 5
+#define RING_MAX_DATATYPE_LENGTH 6
 #define RING_RETURN_STRING_MAX_LENGTH 20
 
 typedef unsigned int uint16_ring;
