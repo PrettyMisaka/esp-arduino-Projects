@@ -4,7 +4,7 @@
 #include <canvasAPI.h>
 
 String htmlCode;
-String canvasCmdCode = "ctx.fillStyle=\"#888888\";ctx.fillRect(0,0,480,320);";
+String sever_canvasCmdCode = "ctx.fillStyle=\"#888888\";ctx.fillRect(0,0,480,320);";
 String canvasSize;
 String webReFlashTime = "1000";
 
@@ -58,7 +58,7 @@ void Web_handleRoot(void) {   //处理网站根目录“/”的访问请求
         var canvas = document.getElementById('tutorial');\
         if(!canvas.getContext) return;\
         var ctx = canvas.getContext(\"2d\");"
-        + canvasAPI_draw.canvasCmdCode +
+        + sever_canvasCmdCode +
     "}\
     draw();\
     </script>\

@@ -5,6 +5,8 @@
 #include <string.h>
 #include <Arduino.h>
 
+#define CANVAS_COORDINATE_ARR_LENGTH 100
+
 class CanvasAPI
 {
 private:
@@ -27,7 +29,26 @@ public:
     void drawStr(int x, int y,const char* str);
 };
 
+class CoordinateAPI : public CanvasAPI
+{
+private:
+    int length;
+    int array[2][CANVAS_COORDINATE_ARR_LENGTH];
+    char color[10];
+    int zero_x;
+    int zero_y;
+public:
+    CoordinateAPI(int x, int y);
+    void setZeroPoint(int x, int y);
+    void setLineColor(const char* color_str);
+    int pushArrayValue(int x, int y);
+    int delArrayValue(int x, int y);
+    void clearArrayValue();
+    void printArray();
+    void showCoordinate();
+};
 
 extern CanvasAPI canvasAPI_draw;
+extern CoordinateAPI CoordinateAPI_Coordinate1;
 
 #endif

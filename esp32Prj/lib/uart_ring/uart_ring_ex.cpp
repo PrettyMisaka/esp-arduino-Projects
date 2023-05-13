@@ -1,7 +1,7 @@
 #include <uart_ring_ex.h>
 
 uartRingParameterTypedef uartRingSerial1Param;
-
+/*******************canvas cmd*******************/
 static void setCanvasSize(callBackFun_EventTypedef e){
     webWidth = e.intData[0];
     webHeight = e.intData[1];
@@ -44,9 +44,34 @@ static void showCanvasCmd(callBackFun_EventTypedef e){
 static void setWebReFlashTime(callBackFun_EventTypedef e){
     Web_SetReFlashTime(e.intData[0]);
 }
+/*******************Coordinate cmd*******************/
+static void setZero(callBackFun_EventTypedef e){
+    CoordinateAPI_Coordinate1.setZeroPoint(e.intData[0],e.intData[1]);
+}
+static void setLineColor(callBackFun_EventTypedef e){
+    CoordinateAPI_Coordinate1.setLineColor(e.stringData[0]);
+}
+static void pushValue(callBackFun_EventTypedef e){
+    int val = CoordinateAPI_Coordinate1.pushArrayValue(e.intData[0],e.intData[1]);
+    if(val == 0) Serial.println("push err");
+    else Serial.println("push success");
+}
+static void delValue(callBackFun_EventTypedef e){
+    int val = CoordinateAPI_Coordinate1.delArrayValue(e.intData[0],e.intData[1]);
+    if(val == 0) Serial.println("del err");
+    else Serial.println("del success");
+}
+static void clearValue(callBackFun_EventTypedef e){
+    CoordinateAPI_Coordinate1.clearArrayValue();
+}
+static void printArray(callBackFun_EventTypedef e){
+    CoordinateAPI_Coordinate1.printArray();
+}
 
 void uartRingSerial1TotalInit(void){
     ringBuff_Total_Init(&uartRingSerial1Param);
+    cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"setWebReFlashTime INT\n", setWebReFlashTime);
+/*******************canvas cmd*******************/
     cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"setCanvasSize INT INT STRING\n", setCanvasSize);
     cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"clearCanvas\n", clearCanvas);
     cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"setFillColor STRING\n", setFillColor);
@@ -61,8 +86,13 @@ void uartRingSerial1TotalInit(void){
     cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"setFont STRING STRING\n", setFont);
     cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"drawStr INT INT STRING\n", drawStr);
     cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"showCanvasCmd\n", showCanvasCmd);
-    
-    cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"setWebReFlashTime INT\n", setWebReFlashTime);
+/*******************Coordinate cmd*******************/
+    cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"setZero INT INT\n", setZero);
+    cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"setLineColor STRING\n", setLineColor);
+    cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"pushValue INT INT\n", pushValue);
+    cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"delValue INT INT\n", delValue);
+    cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"clearValue\n", clearValue);
+    cmdBuff_Push(&uartRingSerial1Param, (unsigned char*)"printArray\n", printArray);
 }
 
 
