@@ -2,6 +2,8 @@
 #define __ESP32_USER_SEVER_H__
 
 #include <WebServer.h>
+#include <bmp_make_ex.h>
+#include <user_base64.h>
 
 extern int webWidth, webHeight;
 extern String sever_canvasCmdCode;

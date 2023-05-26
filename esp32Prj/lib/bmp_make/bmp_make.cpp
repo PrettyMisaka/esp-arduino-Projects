@@ -1,11 +1,12 @@
 #include <bmp_make.h>
 #include <Arduino.h>
-
 BMP_BASE::BMP_BASE(int width, int height){
     file_header_length = 14;
     info_header_length = 40;
-    if(width > BMPIMG_MAXWIDTH) width = BMPIMG_MAXWIDTH;
-    if(height > BMPIMG_MAXHEIGHT) height = BMPIMG_MAXHEIGHT;
+    if(width*height > BMPIMG_MAXWIDTH*BMPIMG_MAXHEIGHT){
+        width = BMPIMG_MAXWIDTH;
+        height = BMPIMG_MAXHEIGHT;
+    }
     data_length = file_header_length + info_header_length + width * height*2;
     img_width = width;
     img_height = height;
@@ -30,9 +31,9 @@ BMP_BASE::BMP_BASE(int width, int height){
 }
 
 void BMP_BASE::drawPixel(int x, int y, uint16_t color){
-    // Serial.printf("file_size%d,info_size%d",sizeof(file_header),sizeof(info_header));
-    bmp_data[file_header.offset + y * info_header.width + x] = color >> 8;
-    bmp_data[file_header.offset + y * info_header.width + x + 1] = color&0x00ff;
+    if(!((0 <= x && x < img_width)&&( 0 <= y && y < img_height))) return;
+    bmp_data[file_header.offset + (y * info_header.width + x)*2] = color;
+    bmp_data[file_header.offset + (y * info_header.width + x)*2 + 1] = color >> 8;
 }
 void BMP_BASE::clear(uint16_t color){
     clear( 0, 0, img_width, img_height, color);
@@ -43,16 +44,18 @@ int BMP_BASE::clear(int x0, int y0, int x1, int y1, uint16_t color){
     if(y1 > img_height) x1 = img_height;
     for (size_t x = x0; x < x1; x++){
         for (size_t y = y0; y < y1; y++){
-            bmp_data[file_header.offset + y * info_header.width + x] = color >> 8;
-            bmp_data[file_header.offset + y * info_header.width + x + 1] = color&0x00ff;
+            bmp_data[file_header.offset + (y * info_header.width + x)*2] = color;
+            bmp_data[file_header.offset + (y * info_header.width + x)*2 + 1] = color >> 8;
         }
     }
     return 1;
 };
 
 void BMP_BASE::resetHeaderData(int width, int height){
-    if(width > BMPIMG_MAXWIDTH) width = BMPIMG_MAXWIDTH;
-    if(height > BMPIMG_MAXHEIGHT) height = BMPIMG_MAXHEIGHT;
+    if(width*height > BMPIMG_MAXWIDTH*BMPIMG_MAXHEIGHT){
+        width = BMPIMG_MAXWIDTH;
+        height = BMPIMG_MAXHEIGHT;
+    }
     img_width = width;
     img_height = height;
     data_length = file_header_length + info_header_length + width * height*2;

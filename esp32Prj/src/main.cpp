@@ -4,8 +4,6 @@
 #include <esp32_user_sever.h>
 #include <uart_ring_ex.h>
 #include <canvasAPI.h>
-#include <bmp_make.h>
-#include <user_base64.h>
 
 const char *ssid = "ESP32-S3 WIFI";
 const char *password = "123456789";
@@ -17,8 +15,6 @@ hw_timer_t * timer = NULL;
 /* 创建定时器中断触发标志 */
 int FLAG_100ms_timIT = 0;
 
-CBase64Coder base64Obj;
-BMP_BASE bmpBase(120,120);
  
 // 中断服务函数，为使编译器将代码分配到IRAM内，中断处理程序应该具有 IRAM_ATTR 属性
 void IRAM_ATTR Callback_TimerIT()
@@ -39,18 +35,25 @@ void setup() {
   uartRingSerial1TotalInit();
   Timer_Init();
 
-  const char* tmp;
+  // const char* tmp;
   bmpBase.pushHeader2data();
-  tmp = base64Obj.encode((char*)bmpBase.bmp_data,bmpBase.data_length);
-  Serial.printf("%s",tmp);
+  bmpBase.clear(WHITE);
+  bmpBase.drawRectangle(10,10,67,89,BLUE);
+  bmpBase.drawCircle(100,100,10,RED);
+  bmpBase.printf_bmpString( 0, 120, BLACK, WHITE, 16, "hello world");
+  // Serial.printf("%s",tmp);
 }
 
+uint16_t color = 0xffff;
 void loop() {
   // put your main code here, to run repeatedly:
   userSeverHandle();
   ringBuffHandleFun(&uartRingSerial1Param);
   // delay(1000);
   if(FLAG_100ms_timIT == 1){
+    bmpBase.clear(0,0,59,59,color);
+    color -= 100;
+    if(color < 0) color = 0xffff;
     digitalWrite(10,!digitalRead(10));
     CoordinateAPI_Coordinate1.showCoordinate();
     sever_canvasCmdCode = CoordinateAPI_Coordinate1.canvasCmdCode;

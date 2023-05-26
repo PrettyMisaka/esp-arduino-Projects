@@ -1,35 +1,53 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+<!DOCTYPE html>    
+<html lang="zh-CN">    
+    <head>        
+        <meta charset="UTF-8">        
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">        
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">        
+        <title>Document</title>    
+    </head>    
+<body>        
     <p>hello world</p>
-    <canvas id="tutorial" width="300" height="300"></canvas>
-</body>
-<script>
-function draw(){
-    var canvas = document.getElementById('tutorial');
-    if(!canvas.getContext) return;
+    <canvas id="tutorial" width="480" height="320"></canvas>
+    <img id="bmpImg1"/>
+</body>    
+<script>    
+function reFlash(){        
+    location.reload();    }    
+setInterval(reFlash, 100000);    
+function draw(){        
+    var canvas = document.getElementById('tutorial');        
+    if(!canvas.getContext) return;        
     var ctx = canvas.getContext("2d");
-    ctx.fillStyle="#808080";
-    ctx.fillRect(50,50,100,100);ctx.clearRect(55,55,90,90);
-    ctx.fillStyle="#FF0000";
-    ctx.strokeStyle='#FF0000'
-    // ctx.beginPath();
-    ctx.moveTo(0, 0);ctx.lineTo(1, 200);
-		ctx.stroke();
-    // ctx.fillStyle="#FF0000";
-    // ctx.beginPath();ctx.moveTo(0, 0);ctx.lineTo(100, 200);ctx.fill();
-}
+    ctx.strokeStyle="#000000";
+    ctx.moveTo(10, 310);
+    ctx.lineTo(410, 310);
+    ctx.stroke();
+    ctx.moveTo(410, 310);
+    ctx.lineTo(405, 305);
+    ctx.stroke();
+    ctx.moveTo(410, 310);
+    ctx.lineTo(405, 315);
+    ctx.stroke();
+    ctx.moveTo(10, 310);
+    ctx.lineTo(10, -90);
+    ctx.stroke();
+    ctx.moveTo(10, -90);
+    ctx.lineTo(15, -85);
+    ctx.stroke();
+    ctx.moveTo(10, -90);
+    ctx.lineTo(5, -85);
+    ctx.stroke();
+    ctx.strokeStyle="#000000";}    
 draw();
-function reFlash(){
-    location.reload();
- }
- setInterval(reFlash, 1000);//间隔一秒不断循环刷新;
-</script>
 
-</html>
+var img = document.getElementById('bmpImg1'); 
+var xhr = new XMLHttpRequest();   
+var responseText;
+function updateCounter(){        
+    xhr.open('GET', 'http://192.168.4.1/updata');        
+    xhr.onreadystatechange = function() {         
+        if (xhr.readyState == 4 && xhr.status == 200) {    
+            img.src = "data:image/bmp;base64,"+xhr.responseText; 
+        }        
+    };    xhr.send();    }    setInterval(updateCounter, 1000);</script>        </html>

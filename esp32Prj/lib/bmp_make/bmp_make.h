@@ -4,7 +4,7 @@
 #include <iostream>
 #include <Arduino.h>
 
-#define BMPIMG_MAXWIDTH 300
+#define BMPIMG_MAXWIDTH 200
 #define BMPIMG_MAXHEIGHT 200
 
 // BMP文件头结构体
@@ -50,5 +50,6 @@ public:
     void clear(uint16_t color);
     int clear(int x0, int y0, int x1, int y1, uint16_t color);
 };
+
 
 #endif

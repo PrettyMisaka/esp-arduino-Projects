@@ -28,4 +28,6 @@ public :
 
 };
 
+extern CBase64Coder base64Obj;
+
 #endif
