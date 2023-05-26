@@ -4,6 +4,8 @@
 #include <esp32_user_sever.h>
 #include <uart_ring_ex.h>
 #include <canvasAPI.h>
+#include <bmp_make.h>
+#include <user_base64.h>
 
 const char *ssid = "ESP32-S3 WIFI";
 const char *password = "123456789";
@@ -14,6 +16,9 @@ hw_timer_t * timer = NULL;
  
 /* 创建定时器中断触发标志 */
 int FLAG_100ms_timIT = 0;
+
+CBase64Coder base64Obj;
+BMP_BASE bmpBase(120,120);
  
 // 中断服务函数，为使编译器将代码分配到IRAM内，中断处理程序应该具有 IRAM_ATTR 属性
 void IRAM_ATTR Callback_TimerIT()
@@ -33,6 +38,11 @@ void setup() {
   Serial.println(WiFi.softAPIP());
   uartRingSerial1TotalInit();
   Timer_Init();
+
+  const char* tmp;
+  bmpBase.pushHeader2data();
+  tmp = base64Obj.encode((char*)bmpBase.bmp_data,bmpBase.data_length);
+  Serial.printf("%s",tmp);
 }
 
 void loop() {
