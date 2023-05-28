@@ -1,5 +1,27 @@
 #include <bmp_make.h>
 #include <Arduino.h>
+static char ch64[] = {
+'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
+'O','P','Q','R','S','T','U','V','W','X','Y','Z',
+'a','b','c','d','e','f','g','h','i','j','k','l','m','n',
+'o','p','q','r','s','t','u','v','w','x','y','z',
+'0','1','2','3','4','5','6','7','8','9','+','/','='
+};
+static uint8_t base64decode(char p){
+        if ( p >= 'A' && p <= 'Z' )
+                return (p - 'A');
+        else if ( p >= 'a' && p <= 'z' )
+                return (p - 'a' + 26);
+        else if ( p >= '0' && p <= '9' )
+                return (p - '0' + 26 + 26);
+        else if ( p == '+' )
+                return 62;
+        else if ( p == '/' )
+                return 63;
+        else if ( p == '=' )
+                return 64;
+        return -1;
+}
 BMP_BASE::BMP_BASE(int width, int height){
     file_header_length = 14;
     info_header_length = 40;
@@ -7,9 +29,12 @@ BMP_BASE::BMP_BASE(int width, int height){
         width = BMPIMG_MAXWIDTH;
         height = BMPIMG_MAXHEIGHT;
     }
-    data_length = file_header_length + info_header_length + width * height*2;
-    img_width = width;
-    img_height = height;
+    this->data_length = file_header_length + info_header_length + width * height*2;
+    this->img_width = width;
+    this->img_height = height;
+    this->base64_length = (data_length + 3 - data_length % 3) * 4 / 3;
+    this->base64_offset = 54*4/3;
+    this->bmp_data[base64_length] = 0;
     // BMP文件头
     file_header.type = 0x4D42; // BM
     file_header.size = data_length;
@@ -32,8 +57,58 @@ BMP_BASE::BMP_BASE(int width, int height){
 
 void BMP_BASE::drawPixel(int x, int y, uint16_t color){
     if(!((0 <= x && x < img_width)&&( 0 <= y && y < img_height))) return;
+#ifndef BMP_ENCODING_FORMAT_USE_BASE64
     bmp_data[file_header.offset + (y * info_header.width + x)*2] = color;
     bmp_data[file_header.offset + (y * info_header.width + x)*2 + 1] = color >> 8;
+#else
+    int pix_index = y * info_header.width + x;
+    int pix_offset = pix_index%3;
+    int base64_index = this->base64_offset + (pix_index/3)*8/*base64*/;
+    char ch[4];
+    uint8_t decodeVal;
+    switch (pix_offset)
+    {
+    case 0:
+        decodeVal = base64decode((char)bmp_data[base64_index+2]);
+        ch[0] = (char)((color&0x00FC) >> 2 );
+        ch[1] = (char)((color&0x0003) << 4 | ((color>>8)&0xF0) >> 4 );
+        ch[2] = (char)((((color>>8)&0x000F) << 2 )|(decodeVal&0x03)&0xcf);
+        //查询编码数组获取编码后的字符
+        bmp_data[base64_index]   = ch64[ch[0]];
+        bmp_data[base64_index+1] = ch64[ch[1]];
+        bmp_data[base64_index+2] = ch64[ch[2]];
+        // if(base64_index == base64_offset) Serial.printf("|%d %d|",ch[2],ch64[ch[2]]);
+        break;
+    case 1:
+        decodeVal = base64decode((char)bmp_data[base64_index+2]);
+        ch[0] = (char)(( (decodeVal&0x3c )| ((color&0x00c0) >> 6)));
+        // if(base64_index == base64_offset) Serial.printf("|%d %d %d %d %d|",color,decodeVal,decodeVal&0x3c,(color&0x00c0 >> 6),ch[0]);
+        ch[1] = (char)((color&0x003f));
+        ch[2] = (char)(((color>>8)&0x00fc) >> 2 );
+        decodeVal = base64decode((char)bmp_data[base64_index+5]);
+        ch[3] = (char)((((color>>8)&0x0003) << 4 )|(decodeVal&0x0f));
+        //查询编码数组获取编码后的字符
+        bmp_data[base64_index+2]   = ch64[ch[0]];
+        bmp_data[base64_index+2+1] = ch64[ch[1]];
+        bmp_data[base64_index+2+2] = ch64[ch[2]];
+        bmp_data[base64_index+2+3] = ch64[ch[3]];
+        break;
+    case 2:
+        decodeVal = base64decode((char)bmp_data[base64_index+5]);
+        ch[0] = (char)(((color&0x00F0) >> 4 )| (decodeVal&0x30));
+        ch[1] = (char)((color&0x000f) << 2 | ((color>>8)&0x00c0) >> 6 );
+        ch[2] = (char)(((color>>8)&0x003F));
+        //查询编码数组获取编码后的字符
+        bmp_data[base64_index+5] = ch64[ch[0]];
+        bmp_data[base64_index+6] = ch64[ch[1]];
+        bmp_data[base64_index+7] = ch64[ch[2]];
+        break;
+    default:
+        break;
+    }
+    if(base64_index == 4096 && 0)
+            Serial.printf("%d|%d|%d|%d\n",ch[0],ch[1],ch[2],ch[3]);
+#endif
 }
 void BMP_BASE::clear(uint16_t color){
     clear( 0, 0, img_width, img_height, color);
@@ -44,8 +119,7 @@ int BMP_BASE::clear(int x0, int y0, int x1, int y1, uint16_t color){
     if(y1 > img_height) x1 = img_height;
     for (size_t x = x0; x < x1; x++){
         for (size_t y = y0; y < y1; y++){
-            bmp_data[file_header.offset + (y * info_header.width + x)*2] = color;
-            bmp_data[file_header.offset + (y * info_header.width + x)*2 + 1] = color >> 8;
+            drawPixel( x, y, color);
         }
     }
     return 1;
@@ -152,4 +226,17 @@ void BMP_BASE::pushHeader2data(){
     bmp_data[offset + 2] = info_header.clr_important >> 16;
     bmp_data[offset + 3] = info_header.clr_important >> 24;
     offset += 4;
+    // 转换为base64 从后往前 offset == 54
+    char ch[4];
+    for (int i = file_header_length + info_header_length - 3 ,j = base64_offset - 4; i >= 0;  i -= 3,j -= 4 ){
+        ch[0] = (char)((bmp_data[i]&0xFC) >> 2 );
+        ch[1] = (char)((bmp_data[i]&0x03) << 4 | (bmp_data[i+1]&0xF0) >> 4 );
+        ch[2] = (char)((bmp_data[i+1]&0x0F) << 2 | (bmp_data[i+2]&0xC0) >> 6 );
+        ch[3] = (char)((bmp_data[i+2]&0x3F));
+        //查询编码数组获取编码后的字符
+        bmp_data[j]   = ch64[ch[0]];
+        bmp_data[j+1] = ch64[ch[1]];
+        bmp_data[j+2] = ch64[ch[2]];
+        bmp_data[j+3] = ch64[ch[3]];
+    }
 };

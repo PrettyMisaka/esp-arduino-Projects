@@ -14,6 +14,7 @@ int webWidth = 480, webHeight = 320;
 
 static void Web_handleRoot(void);
 static void Web_handleUpdataImg(void);
+static void Web_handleSerialTx(void);
 static void Web_handleNotFound(void);
 
 void userSeverInit(void){
@@ -22,6 +23,7 @@ void userSeverInit(void){
     esp32_server.enableCORS();
     esp32_server.on("/",HTTP_GET,Web_handleRoot);  //函数处理当有HTTP请求 "/HolleWorld" 时执行函数 handleRoot
     esp32_server.on("/updata",HTTP_GET,Web_handleUpdataImg);  //函数处理当有HTTP请求 "/HolleWorld" 时执行函数 handleRoot  
+    esp32_server.on("/serialTx",HTTP_GET,Web_handleSerialTx);
     esp32_server.onNotFound(Web_handleNotFound);  //当请求的网络资源不在服务器的时候，执行函数 handleFound 
 }
 
@@ -39,10 +41,36 @@ void Web_SetReFlashTime(int time_ms){
 void userSeverHandle(void){
     esp32_server.handleClient();
 }
+static int updata_img_index = 0;
 void Web_handleUpdataImg(void){
-  const char* tmp = base64Obj.encode((char*)bmpBase.bmp_data,bmpBase.data_length);
-  esp32_server.send(200, "text/plain", tmp);
+  // const char* tmp = base64Obj.encode((char*)bmpBase.bmp_data,bmpBase.data_length);
+  /*
+  if((bmpBase.data_length-updata_img_index)/3 > 0){
+    if((bmpBase.data_length-updata_img_index)==3){
+      esp32_server.send_P(200, "text/plain", base64Obj.encode((char*)&bmpBase.bmp_data[updata_img_index]),3);
+      updata_img_index = 0;
+    }
+    else
+    esp32_server.send_P(206, "text/plain", base64Obj.encode((char*)&bmpBase.bmp_data[updata_img_index]),3);
+    updata_img_index += 3;
+  }
+  else{
+    esp32_server.send_P(200, "text/plain", base64Obj.encode((char*)&bmpBase.bmp_data[updata_img_index]),(bmpBase.data_length-updata_img_index)%3);
+    updata_img_index = 0;
+  }
+  */
+  esp32_server.send_P(200, "text/plain", (char*)bmpBase.bmp_data);
 }
+void Web_handleSerialTx(void){
+    if (esp32_server.hasArg("serialTxInfo")) { // check if the request has a plain text body
+      String body = esp32_server.arg("serialTxInfo"); // get the body as a string
+      body += "\n";
+      // ... do something with the body ...
+      Serial.printf("%s",body);
+    }
+    esp32_server.sendHeader("Location","/");              //跳转回页面的根目录
+    esp32_server.send(303);
+};
 void Web_handleRoot(void) {   //处理网站根目录“/”的访问请求 
   htmlCode = "<!DOCTYPE html>\
     <html lang=\"zh-CN\">\
@@ -54,6 +82,9 @@ void Web_handleRoot(void) {   //处理网站根目录“/”的访问请求
     </head>\
     <body>\
         <p>hello world</p>\
+        <form id=\"serialTx\" action=\"/serialTx\" method=\"GET\" style=\"display:inline-block\">\
+        <input type=\"text\" placeholder=\"输入想往串口发送的数据\" name=\"serialTxInfo\">\
+        <input id=\"send-serial-info\" type=\"submit\" style=\"cursor:pointer\" value=\"send\" title=\"send\" style=\"height:10%;\"></form>\
         <img id=\"bmpImg1\"/>"
         + canvasSize +
     "</body>\

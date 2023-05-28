@@ -43,11 +43,38 @@ draw();
 
 var img = document.getElementById('bmpImg1'); 
 var xhr = new XMLHttpRequest();   
-var responseText;
+var responseText = "";
 function updateCounter(){        
     xhr.open('GET', 'http://192.168.4.1/updata');        
     xhr.onreadystatechange = function() {         
-        if (xhr.readyState == 4 && xhr.status == 200) {    
-            img.src = "data:image/bmp;base64,"+xhr.responseText; 
+        // if (xhr.readyState == 4 && xhr.status == 206) {    
+        //     responseText += xhr.responseText;
+        //     updateCounter();
+        // }
+        if (xhr.readyState == 4 && xhr.status == 200) {        
+            responseText += xhr.responseText;
+            img.src = "data:image/bmp;base64,"+responseText;
+            // console.log(responseText);
+            responseText = ""
+            setTimeout(updateCounter, 1000);
         }        
-    };    xhr.send();    }    setInterval(updateCounter, 1000);</script>        </html>
+    };    
+    xhr.send();    
+}    
+updateCounter();
+// setInterval(updateCounter, 1000);
+    function stringToHex(str){
+    var val="";
+    for(var i = 0; i < str.length; i++){
+
+    if(val == "")
+    val = str.charCodeAt(i).toString(16);
+    else
+    val += "," + str.charCodeAt(i).toString(16);
+    }
+    return val;
+    }
+console.log(stringToHex(window.atob("F/zX/Bf8")));
+// console.log(window.btoa(0x17fc17fc17fc));
+</script>        
+</html>

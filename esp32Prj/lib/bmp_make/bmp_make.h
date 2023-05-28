@@ -4,8 +4,11 @@
 #include <iostream>
 #include <Arduino.h>
 
-#define BMPIMG_MAXWIDTH 200
-#define BMPIMG_MAXHEIGHT 200
+#define BMPIMG_MAXWIDTH 250
+#define BMPIMG_MAXHEIGHT 250
+
+#define BMP_ENCODING_FORMAT_USE_BASE64
+//0 原始格式 1 base64
 
 // BMP文件头结构体
 typedef struct {
@@ -39,9 +42,16 @@ private:
     int file_header_length, info_header_length;
 public:
     int data_length;
+    int base64_length;
+    int base64_offset;
     int img_width, img_height;
+#ifndef BMP_ENCODING_FORMAT_USE_BASE64
+    //bmp length 
     uint8_t bmp_data[14 + 40 + BMPIMG_MAXWIDTH*BMPIMG_MAXHEIGHT*2 + 1];
-
+#else
+    //base64 length
+    uint8_t bmp_data[((14 + 40 + BMPIMG_MAXWIDTH*BMPIMG_MAXHEIGHT*2)+3-(14 + 40 + BMPIMG_MAXWIDTH*BMPIMG_MAXHEIGHT*2)%3)*4/3+1];
+#endif
     BMP_BASE(int width, int height);
     void resetHeaderData(int width, int height);
     void pushHeader2data();

@@ -4,6 +4,7 @@
 #include <esp32_user_sever.h>
 #include <uart_ring_ex.h>
 #include <canvasAPI.h>
+#include "bmp_font.h"
 
 const char *ssid = "ESP32-S3 WIFI";
 const char *password = "123456789";
@@ -25,10 +26,12 @@ void IRAM_ATTR Callback_TimerIT()
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+  Serial2.begin(115200, SERIAL_8N1, 0, 1);
   pinMode(10, OUTPUT);
   WiFi.softAP(ssid,password);
   userSeverInit();
 
+  Serial2.printf("hello");
   Serial.print("Access Point: ");
   Serial.println(ssid);
   Serial.println(WiFi.softAPIP());
@@ -37,11 +40,15 @@ void setup() {
 
   // const char* tmp;
   bmpBase.pushHeader2data();
-  bmpBase.clear(WHITE);
+  bmpBase.clear(0xfc17);
   bmpBase.drawRectangle(10,10,67,89,BLUE);
   bmpBase.drawCircle(100,100,10,RED);
   bmpBase.printf_bmpString( 0, 120, BLACK, WHITE, 16, "hello world");
-  // Serial.printf("%s",tmp);
+  bmpBase.showImage(0,0,240,135,gImage_misaka);
+  if(0){
+    Serial.printf("%d %d \n",strlen((char*)bmpBase.bmp_data),bmpBase.bmp_data[4098]);
+    Serial.printf("%s",((char*)bmpBase.bmp_data));
+  }
 }
 
 uint16_t color = 0xffff;
@@ -51,7 +58,8 @@ void loop() {
   ringBuffHandleFun(&uartRingSerial1Param);
   // delay(1000);
   if(FLAG_100ms_timIT == 1){
-    bmpBase.clear(0,0,59,59,color);
+    Serial2.printf("500ms");
+    // bmpBase.clear(0,0,59,59,color);
     color -= 100;
     if(color < 0) color = 0xffff;
     digitalWrite(10,!digitalRead(10));

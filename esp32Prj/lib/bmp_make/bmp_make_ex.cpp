@@ -1,6 +1,6 @@
 #include "bmp_make_ex.h"
 #include "bmp_font.h"
-BMP_EX bmpBase(200,200);
+BMP_EX bmpBase(300,200);
 
 void BMP_EX::drawLine(int x0, int y0, int x1, int y1, uint16_t color){
     uint16_t t;
@@ -153,3 +153,13 @@ void BMP_EX::printf_bmpString(int x, int y, uint16_t point_color, uint16_t back_
   showString( x,  y,  strlen(str)*size,  size, point_color, back_color, size, str);
   va_end(v);
 }
+
+void BMP_EX::showImage(int x, int y, int width, int height, const uint8_t *p){
+    uint16_t color;
+    for(int j = 0; j < height; j++){
+        for (int i = 0; i < width; i++){
+            color = (p[ i * j * 2]<< 8) | (p[ i * j * 2 + 1]);
+            drawPixel( x + i , y + j, color);
+        }
+    }
+}  

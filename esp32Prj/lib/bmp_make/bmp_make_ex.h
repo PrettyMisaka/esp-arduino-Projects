@@ -27,6 +27,7 @@ class BMP_EX : public BMP_BASE{
         void showChar(int x, int y, char chr, uint8_t size, uint16_t point_color, uint16_t back_color);
         void showString(int x, int y, int width, int height, uint16_t point_color, uint16_t back_color, uint8_t size, char *p);
         void printf_bmpString(int x, int y, uint16_t point_color, uint16_t back_color, uint8_t size, const char* buf, ...);
+        void showImage(int x, int y, int width, int height, const uint8_t *p);
 };
 
 extern BMP_EX bmpBase;
