@@ -56,13 +56,13 @@ function updateCounter(){
             img.src = "data:image/bmp;base64,"+responseText;
             // console.log(responseText);
             responseText = ""
-            setTimeout(updateCounter, 1000);
+            // setTimeout(updateCounter, 100);
         }        
     };    
     xhr.send();    
 }    
-updateCounter();
-// setInterval(updateCounter, 1000);
+// updateCounter();
+setInterval(updateCounter, 1000);
     function stringToHex(str){
     var val="";
     for(var i = 0; i < str.length; i++){

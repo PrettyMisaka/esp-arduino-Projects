@@ -26,25 +26,27 @@ void IRAM_ATTR Callback_TimerIT()
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  Serial2.begin(115200, SERIAL_8N1, 0, 1);
+  Serial1.begin(115200, SERIAL_8N1, 0, 1);
   pinMode(10, OUTPUT);
   WiFi.softAP(ssid,password);
   userSeverInit();
 
-  Serial2.printf("hello");
+  Serial1.printf("hello");
   Serial.print("Access Point: ");
   Serial.println(ssid);
   Serial.println(WiFi.softAPIP());
-  uartRingSerial1TotalInit();
+  uartRingDebugTotalInit();
+  uartRingSerial2TotalInit();
   Timer_Init();
 
   // const char* tmp;
   bmpBase.pushHeader2data();
-  bmpBase.clear(0xfc17);
+  Serial.printf("%d\n",((16)<<11)|((32)<<5)|(16));
+  bmpBase.clear(0xfe19);
   bmpBase.drawRectangle(10,10,67,89,BLUE);
   bmpBase.drawCircle(100,100,10,RED);
   bmpBase.printf_bmpString( 0, 120, BLACK, WHITE, 16, "hello world");
-  bmpBase.showImage(0,0,240,135,gImage_misaka);
+  // bmpBase.showImage(0,0,240,135,gImage_misaka);
   if(0){
     Serial.printf("%d %d \n",strlen((char*)bmpBase.bmp_data),bmpBase.bmp_data[4098]);
     Serial.printf("%s",((char*)bmpBase.bmp_data));
@@ -55,10 +57,11 @@ uint16_t color = 0xffff;
 void loop() {
   // put your main code here, to run repeatedly:
   userSeverHandle();
-  ringBuffHandleFun(&uartRingSerial1Param);
+  ringBuffHandleFun(&uartRingDebugParam);
+  ringBuffHandleFun(&uartRingSerial2Param);
   // delay(1000);
   if(FLAG_100ms_timIT == 1){
-    Serial2.printf("500ms");
+    Serial1.printf("500ms");
     // bmpBase.clear(0,0,59,59,color);
     color -= 100;
     if(color < 0) color = 0xffff;
@@ -73,9 +76,19 @@ void serialEvent()
 {
   while (Serial.available()) 
   {
-    ringBuff_Push( &uartRingSerial1Param, char(Serial.read()));
+    ringBuff_Push( &uartRingDebugParam, char(Serial.read()));
     delay(2); //这里不能去掉，要给串口处理数据的时间
   }
+}
+
+void serialEvent1() 
+{
+  while (Serial1.available()) 
+  {
+    ringBuff_Push( &uartRingSerial2Param, char(Serial1.read()));
+    delay(2); //这里不能去掉，要给串口处理数据的时间
+  }
+  Serial1.printf("rx");
 }
  
 void Timer_Init()

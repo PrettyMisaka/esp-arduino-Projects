@@ -21,9 +21,9 @@ void userSeverInit(void){
     Web_CanvasSetSize();
     esp32_server.begin();  //启动网络服务器
     esp32_server.enableCORS();
-    esp32_server.on("/",HTTP_GET,Web_handleRoot);  //函数处理当有HTTP请求 "/HolleWorld" 时执行函数 handleRoot
+    esp32_server.on("/",HTTP_GET,Web_handleRoot);  //函数处理当有HTTP请求 "/" 时执行函数 handleRoot
     esp32_server.on("/updata",HTTP_GET,Web_handleUpdataImg);  //函数处理当有HTTP请求 "/HolleWorld" 时执行函数 handleRoot  
-    esp32_server.on("/serialTx",HTTP_GET,Web_handleSerialTx);
+    esp32_server.on("/serialTx",HTTP_POST,Web_handleSerialTx);
     esp32_server.onNotFound(Web_handleNotFound);  //当请求的网络资源不在服务器的时候，执行函数 handleFound 
 }
 
@@ -59,6 +59,8 @@ void Web_handleUpdataImg(void){
     updata_img_index = 0;
   }
   */
+  bmpBase.printf_bmpString( 0, 80, BLACK, WHITE, 16, "count:%d",updata_img_index);
+  updata_img_index++;
   esp32_server.send_P(200, "text/plain", (char*)bmpBase.bmp_data);
 }
 void Web_handleSerialTx(void){
@@ -82,10 +84,10 @@ void Web_handleRoot(void) {   //处理网站根目录“/”的访问请求
     </head>\
     <body>\
         <p>hello world</p>\
-        <form id=\"serialTx\" action=\"/serialTx\" method=\"GET\" style=\"display:inline-block\">\
+        <form id=\"serialTx\" action=\"/serialTx\" method=\"POST\" style=\"display:inline-block\">\
         <input type=\"text\" placeholder=\"输入想往串口发送的数据\" name=\"serialTxInfo\">\
         <input id=\"send-serial-info\" type=\"submit\" style=\"cursor:pointer\" value=\"send\" title=\"send\" style=\"height:10%;\"></form>\
-        <img id=\"bmpImg1\"/>"
+        <div><img id=\"bmpImg1\"/></div>"
         + canvasSize +
     "</body>\
     <script>\
@@ -98,8 +100,8 @@ void Web_handleRoot(void) {   //处理网站根目录“/”的访问请求
         if(!canvas.getContext) return;\
         var ctx = canvas.getContext(\"2d\");"
         + sever_canvasCmdCode +
-    "}\
-    draw();"+
+    "}"+
+    // "draw();"+
     //XMLHttpRequest code
     "var xhr = new XMLHttpRequest();\
     var img = document.getElementById('bmpImg1'); \

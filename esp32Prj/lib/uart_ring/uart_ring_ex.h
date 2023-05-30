@@ -5,9 +5,12 @@
 #include <esp32_user_sever.h>
 #include <Arduino.h>
 #include <canvasAPI.h>
+#include <bmp_make_ex.h>
 
-extern uartRingParameterTypedef uartRingSerial1Param;
+extern uartRingParameterTypedef uartRingDebugParam;
+extern uartRingParameterTypedef uartRingSerial2Param;
 
-void uartRingSerial1TotalInit(void);
+void uartRingDebugTotalInit(void);
+void uartRingSerial2TotalInit(void);
 
 #endif
