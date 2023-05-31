@@ -15,6 +15,7 @@ int webWidth = 480, webHeight = 320;
 static void Web_handleRoot(void);
 static void Web_handleUpdataImg(void);
 static void Web_handleSerialTx(void);
+static void Web_handleMoveControl(void);
 static void Web_handleNotFound(void);
 
 void userSeverInit(void){
@@ -23,7 +24,8 @@ void userSeverInit(void){
     esp32_server.enableCORS();
     esp32_server.on("/",HTTP_GET,Web_handleRoot);  //函数处理当有HTTP请求 "/" 时执行函数 handleRoot
     esp32_server.on("/updata",HTTP_GET,Web_handleUpdataImg);  //函数处理当有HTTP请求 "/HolleWorld" 时执行函数 handleRoot  
-    esp32_server.on("/serialTx",HTTP_POST,Web_handleSerialTx);
+    esp32_server.on("/serialTx",HTTP_POST,Web_handleSerialTx);  
+    esp32_server.on("/moveControl",HTTP_GET,Web_handleMoveControl);
     esp32_server.onNotFound(Web_handleNotFound);  //当请求的网络资源不在服务器的时候，执行函数 handleFound 
 }
 
@@ -37,7 +39,6 @@ void Web_SetReFlashTime(int time_ms){
   sprintf(str_tmp,"%d", time_ms);
   webReFlashTime = str_tmp;
 }
-
 void userSeverHandle(void){
     esp32_server.handleClient();
 }
@@ -69,10 +70,92 @@ void Web_handleSerialTx(void){
       body += "\n";
       // ... do something with the body ...
       Serial.printf("%s",body);
+      Serial2.printf("%s",body);
     }
     esp32_server.sendHeader("Location","/");              //跳转回页面的根目录
     esp32_server.send(303);
 };
+static int speed;
+void Web_handleMoveControl(){
+  if (esp32_server.hasArg("moveState")) {
+    int movestate = -1;
+    String body = esp32_server.arg("moveState"); // get the body as a string
+    if(body.equals("movelu")){ 
+      movestate = 0;
+      Serial2.printf("5340%d",speed);}
+    else if (body.equals("forward")){ 
+      movestate = 1;
+      Serial2.printf("5440%d",speed);}
+    else if (body.equals("moveru")){ 
+      movestate = 2;
+      Serial2.printf("5540%d",speed);}
+    else if (body.equals("left")){ 
+      movestate = 3;
+      Serial2.printf("4340%d",speed);}
+    else if (body.equals("stop")){ 
+      movestate = 3;
+      Serial2.printf("4440%d",speed);}
+    else if (body.equals("right")){ 
+      movestate = 3;
+      Serial2.printf("4540%d",speed);}
+    else if (body.equals("moveld")){ 
+      movestate = 3;
+      Serial2.printf("3340%d",speed);}
+    else if (body.equals("back")){ 
+      movestate = 3;
+      Serial2.printf("3440%d",speed);}
+    else if (body.equals("moverd")){ 
+      movestate = 3;
+      Serial2.printf("3540%d",speed);}
+    else if (body.equals("rotatel")){ 
+      movestate = 3;
+      Serial2.printf("4430%d",speed);}
+    else if (body.equals("setspeed")){ 
+      movestate = 3;
+      Serial2.printf("4440%d",speed);
+        if (esp32_server.hasArg("speed")){
+          String speedString = esp32_server.arg("speed");
+          // Serial2.printf("%d\n",speedString.toInt());
+          speed = speedString.toInt()/50;
+          if(speed >= 10) speed = 9;
+          else if(speed < 0) speed = 0;
+          // Serial2.printf("speed:%s\n",esp32_server.arg("speed"));
+        }
+      }
+    else if (body.equals("rotater")){ 
+      movestate = 3;
+      Serial2.printf("4450%d",speed);}
+    // Serial2.printf("movestate|%s|\n",body);
+    // Serial2.printf("movestate%d\n",movestate);
+  }
+  esp32_server.sendHeader("Location","/");              //跳转回页面的根目录
+  esp32_server.send(303);
+}
+String html_control = "<div><form action=\"/moveControl\" method=\"GET\" id=\"move-control\">\
+        <input type=\"range\" max=\"500\" min=\"0\" name=\"speed\" style=\"width: 300px;\">\
+        <div><button name=\"moveState\" value=\"movelu\">movelu </button>\
+            <button name=\"moveState\" value=\"forward\">forward</button>\
+            <button name=\"moveState\" value=\"moveru\">moveru </button></div>\
+        <div><button name=\"moveState\" value=\"left\">left   </button>\
+            <button name=\"moveState\" value=\"stop\">stop   </button>\
+            <button name=\"moveState\" value=\"right\">right  </button></div>\
+        <div><button name=\"moveState\" value=\"moveld\">moveld </button>\
+            <button name=\"moveState\" value=\"back\">back   </button>\
+            <button name=\"moveState\" value=\"moverd\">moverd </button></div>\
+        <div><button name=\"moveState\" value=\"rotatel\">rotatel </button>\
+            <button name=\"moveState\" value=\"setspeed\">setspeed   </button>\
+            <button name=\"moveState\" value=\"rotater\">rotater </button></div>\
+    </form></div>\
+    <style>\
+        form#move-control div{\
+            height: 100px;}\
+        form#move-control button{\
+            margin: 0;\
+            float: left;\
+            height: 100px;\
+            width: 100px;\
+        }\
+    </style>";
 void Web_handleRoot(void) {   //处理网站根目录“/”的访问请求 
   htmlCode = "<!DOCTYPE html>\
     <html lang=\"zh-CN\">\
@@ -83,11 +166,12 @@ void Web_handleRoot(void) {   //处理网站根目录“/”的访问请求
         <title>Document</title>\
     </head>\
     <body>\
-        <p>hello world</p>\
         <form id=\"serialTx\" action=\"/serialTx\" method=\"POST\" style=\"display:inline-block\">\
         <input type=\"text\" placeholder=\"输入想往串口发送的数据\" name=\"serialTxInfo\">\
-        <input id=\"send-serial-info\" type=\"submit\" style=\"cursor:pointer\" value=\"send\" title=\"send\" style=\"height:10%;\"></form>\
-        <div><img id=\"bmpImg1\"/></div>"
+        <input id=\"send-serial-info\" type=\"submit\" style=\"cursor:pointer\" value=\"send\" title=\"send\" style=\"height:10%;\"></form>"+
+        html_control
+        +
+        "<div><img id=\"bmpImg1\"/></div>"
         + canvasSize +
     "</body>\
     <script>\

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 
+#include "bmp_radar.h"
 #include <esp32_user_sever.h>
 #include <uart_ring_ex.h>
 #include <canvasAPI.h>
@@ -26,18 +27,20 @@ void IRAM_ATTR Callback_TimerIT()
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  Serial1.begin(115200, SERIAL_8N1, 0, 1);
+  Serial2.begin(115200, SERIAL_8N1, 2, 1);
   pinMode(10, OUTPUT);
+  // pinMode(11, OUTPUT);
   WiFi.softAP(ssid,password);
   userSeverInit();
 
-  Serial1.printf("hello");
+  Serial2.printf("444");
   Serial.print("Access Point: ");
   Serial.println(ssid);
   Serial.println(WiFi.softAPIP());
   uartRingDebugTotalInit();
   uartRingSerial2TotalInit();
   Timer_Init();
+  Radar_Init();
 
   // const char* tmp;
   bmpBase.pushHeader2data();
@@ -61,11 +64,9 @@ void loop() {
   ringBuffHandleFun(&uartRingSerial2Param);
   // delay(1000);
   if(FLAG_100ms_timIT == 1){
-    Serial1.printf("500ms");
-    // bmpBase.clear(0,0,59,59,color);
-    color -= 100;
-    if(color < 0) color = 0xffff;
+    Radar_flash();
     digitalWrite(10,!digitalRead(10));
+    // digitalWrite(11,!digitalRead(11));
     CoordinateAPI_Coordinate1.showCoordinate();
     sever_canvasCmdCode = CoordinateAPI_Coordinate1.canvasCmdCode;
     FLAG_100ms_timIT = 0;
@@ -81,14 +82,13 @@ void serialEvent()
   }
 }
 
-void serialEvent1() 
+void serialEvent2() 
 {
-  while (Serial1.available()) 
+  while (Serial2.available()) 
   {
-    ringBuff_Push( &uartRingSerial2Param, char(Serial1.read()));
+    ringBuff_Push( &uartRingSerial2Param, char(Serial2.read()));
     delay(2); //这里不能去掉，要给串口处理数据的时间
   }
-  Serial1.printf("rx");
 }
  
 void Timer_Init()

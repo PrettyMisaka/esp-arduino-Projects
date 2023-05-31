@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div><form action="/nihaoshijie" method="GET" id="move-control">
+        <input type="range" max="500" min="0" name="speed" style="width: 300px;">
+        <div><button name="moveState" value="rotate  ">rotate </button>
+            <button name="moveState" value="forward ">forward</button></div>
+        <div><button name="moveState" value="left    ">left   </button>
+            <button name="moveState" value="stop    ">stop   </button>
+            <button name="moveState" value="right   ">right  </button></div>
+        <div><button name="moveState" value="back    " style="margin-left: 100px;">back   </button></div>
+    </form></div>
+    <style>
+        form#move-control div{
+            height: 100px;
+        }
+        form#move-control button{
+            margin: 0;
+            float: left;
+            height: 100px;
+            width: 100px;
+        }
+    </style>
+</body>
+</html>

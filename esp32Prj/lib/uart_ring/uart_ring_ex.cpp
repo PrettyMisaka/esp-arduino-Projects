@@ -1,4 +1,5 @@
 #include <uart_ring_ex.h>
+#include "bmp_radar.h"
 
 uartRingParameterTypedef uartRingDebugParam;
 uartRingParameterTypedef uartRingSerial2Param;
@@ -123,10 +124,16 @@ static void bmpDrawCircle(callBackFun_EventTypedef e){
     bmpBase.drawCircle(e.intData[0],e.intData[1],e.intData[2],point_color);
 }
 static void bmpShowString(callBackFun_EventTypedef e){
-    bmpBase.showString(e.intData[0],e.intData[1],e.intData[2],e.intData[3],point_color,back_color,16,e.stringData[0]);
+    bmpBase.printf_bmpString(e.intData[0],e.intData[1],point_color,back_color,16,e.stringData[0]);
+}
+static void pushRaderData(callBackFun_EventTypedef e){
+    Radar_Push(e.intData[0],e.intData[1]);
+    Serial.printf("%d %d",e.intData[0],e.intData[1]);
 }
 void uartRingSerial2TotalInit(void){
     ringBuff_Total_Init(&uartRingSerial2Param);
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"pushRD INT INT\n", pushRaderData);
+
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"setBmpSize INT INT\n", setBmpSize);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"setPointCol INT INT INT\n", setPointCol);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"setBackCol INT INT INT\n", setBackCol);
@@ -135,6 +142,6 @@ void uartRingSerial2TotalInit(void){
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"bmpDrawLine INT INT INT INT\n", bmpDrawLine);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"bmpDrawRectangle INT INT INT INT\n", bmpDrawRectangle);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"bmpDrawCircle INT INT INT\n", bmpDrawCircle);
-    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"bmpShowString INT INT INT INT STRING\n", bmpShowString);
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"bmpShowString INT INT STRING\n", bmpShowString);
     // cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"\n", );
 }
