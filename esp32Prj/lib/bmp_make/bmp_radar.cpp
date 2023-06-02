@@ -3,7 +3,7 @@
 
 int radarMaxValue = 1500;
 int radarMaxPixVal = 150;
-int radarDataOffset[2][180];
+int radarDataOffset[2][181];
 
 void Radar_Init(){
     for(int i = 0; i <180; i++){
@@ -12,7 +12,7 @@ void Radar_Init(){
     }
 }
 
-void Radar_Push(int val, short angle){
+void Radar_Push(int val, int angle){
     if(!(0 <= angle && angle <= 180)) return;
     if(angle >= 90) angle = 180 - angle;
     double val2Pix = val*(float)radarMaxPixVal/radarMaxValue;
@@ -34,6 +34,12 @@ void Radar_Push(int val, short angle){
         radarDataOffset[0][angle] = (int)val2Pix*cosVal;//offsetX
         radarDataOffset[1][angle] = (int)val2Pix*sinVal;//offsetY
         }
+}
+
+void Rader_Push_Index(int index, int xOffset, int YOffset){// xOffset 0~300
+    if(!(0<=index&&index<=180)) return;
+    radarDataOffset[0][index] = xOffset;//offsetX
+    radarDataOffset[1][index] = YOffset;//offsetY
 }
 
 void Radar_flash(){

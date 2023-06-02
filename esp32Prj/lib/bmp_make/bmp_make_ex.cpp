@@ -1,6 +1,6 @@
 #include "bmp_make_ex.h"
 #include "bmp_font.h"
-BMP_EX bmpBase(300,200);
+BMP_EX bmpBase(200,300);
 
 void BMP_EX::drawLine(int x0, int y0, int x1, int y1, uint16_t color){
     uint16_t t;

@@ -32,6 +32,9 @@ void ringBuff_Push(uartRingParameterTypedef *uart_ring_param_P, uint8_ring data)
     uart_ring_param_P->ringBuffTail = (uart_ring_param_P->ringBuffTail + 1) % RING_BUFF_LENGTH;
     uart_ring_param_P->ringBuffArr[uart_ring_param_P->ringBuffTail] = data;
     uart_ring_param_P->ringBuffLength++;
+    if(uart_ring_param_P->ringBuffLength == RING_BUFF_LENGTH - 2){
+        ringBuff_Init(uart_ring_param_P);
+    }
 }
 
 /*

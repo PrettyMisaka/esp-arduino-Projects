@@ -1,4 +1,5 @@
 #include <uart_ring_ex.h>
+#include <bmp_23SevenSchool.h>
 #include "bmp_radar.h"
 
 uartRingParameterTypedef uartRingDebugParam;
@@ -127,12 +128,28 @@ static void bmpShowString(callBackFun_EventTypedef e){
     bmpBase.printf_bmpString(e.intData[0],e.intData[1],point_color,back_color,16,e.stringData[0]);
 }
 static void pushRaderData(callBackFun_EventTypedef e){
-    Radar_Push(e.intData[0],e.intData[1]);
-    Serial.printf("%d %d",e.intData[0],e.intData[1]);
+    Rader_Push_Index(e.intData[0],e.intData[1],e.intData[2]);
+    // Serial.printf("%d %d",e.intData[0],e.intData[1]);
+}
+
+static void ss23_setIsRun(callBackFun_EventTypedef e){
+    SS23_SetisRunning(e.intData[0]);
+}
+static void ss23_showAngle(callBackFun_EventTypedef e){
+    SS23_showAngle(e.intData[0],e.floatData[0]);
+}
+static void ss23_topNum(callBackFun_EventTypedef e){
+    SS23_showTopNum(e.stringData[0][0]);
+}
+static void ss23_route(callBackFun_EventTypedef e){
+    SS23_showRoute(e.stringData[0]);
+}
+static void ss23_initNum(callBackFun_EventTypedef e){
+    SS23_showInitNum(e.intData[0]);
 }
 void uartRingSerial2TotalInit(void){
     ringBuff_Total_Init(&uartRingSerial2Param);
-    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"pushRD INT INT\n", pushRaderData);
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"pushRD INT INT INT\n", pushRaderData);
 
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"setBmpSize INT INT\n", setBmpSize);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"setPointCol INT INT INT\n", setPointCol);
@@ -144,4 +161,9 @@ void uartRingSerial2TotalInit(void){
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"bmpDrawCircle INT INT INT\n", bmpDrawCircle);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"bmpShowString INT INT STRING\n", bmpShowString);
     // cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"\n", );
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"isRun INT\n", ss23_setIsRun);
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"angle INT FLOAT\n", ss23_showAngle);
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"topNum STRING\n", ss23_topNum);
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"route STRING\n", ss23_route);
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"initNum INT\n", ss23_initNum);
 }

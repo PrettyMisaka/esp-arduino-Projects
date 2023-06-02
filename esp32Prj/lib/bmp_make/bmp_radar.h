@@ -8,7 +8,8 @@
 #endif
 
 void Radar_Init();
-void Radar_Push(int val, short angle);
+void Radar_Push(int val, int angle);
+void Rader_Push_Index(int index, int xOffset, int YOffset);
 void Radar_flash();
 
 #endif

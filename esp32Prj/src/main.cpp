@@ -6,6 +6,7 @@
 #include <uart_ring_ex.h>
 #include <canvasAPI.h>
 #include "bmp_font.h"
+#include <bmp_23SevenSchool.h>
 
 const char *ssid = "ESP32-S3 WIFI";
 const char *password = "123456789";
@@ -49,6 +50,7 @@ void setup() {
   bmpBase.drawRectangle(10,10,67,89,BLUE);
   bmpBase.drawCircle(100,100,10,RED);
   bmpBase.printf_bmpString( 0, 120, BLACK, WHITE, 16, "hello world");
+  SS23_Init();
   // bmpBase.showImage(0,0,240,135,gImage_misaka);
   if(0){
     Serial.printf("%d %d \n",strlen((char*)bmpBase.bmp_data),bmpBase.bmp_data[4098]);
@@ -64,7 +66,7 @@ void loop() {
   ringBuffHandleFun(&uartRingSerial2Param);
   // delay(1000);
   if(FLAG_100ms_timIT == 1){
-    Radar_flash();
+    // Radar_flash();
     digitalWrite(10,!digitalRead(10));
     // digitalWrite(11,!digitalRead(11));
     CoordinateAPI_Coordinate1.showCoordinate();
@@ -78,7 +80,7 @@ void serialEvent()
   while (Serial.available()) 
   {
     ringBuff_Push( &uartRingDebugParam, char(Serial.read()));
-    delay(2); //这里不能去掉，要给串口处理数据的时间
+    // delay(2); //这里不能去掉，要给串口处理数据的时间
   }
 }
 
@@ -87,7 +89,7 @@ void serialEvent2()
   while (Serial2.available()) 
   {
     ringBuff_Push( &uartRingSerial2Param, char(Serial2.read()));
-    delay(2); //这里不能去掉，要给串口处理数据的时间
+    // delay(2); //这里不能去掉，要给串口处理数据的时间
   }
 }
  
