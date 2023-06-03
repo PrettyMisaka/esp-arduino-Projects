@@ -51,6 +51,7 @@ void setup() {
   bmpBase.drawCircle(100,100,10,RED);
   bmpBase.printf_bmpString( 0, 120, BLACK, WHITE, 16, "hello world");
   SS23_Init();
+  SS23_InitMap();
   // bmpBase.showImage(0,0,240,135,gImage_misaka);
   if(0){
     Serial.printf("%d %d \n",strlen((char*)bmpBase.bmp_data),bmpBase.bmp_data[4098]);
@@ -86,9 +87,12 @@ void serialEvent()
 
 void serialEvent2() 
 {
+  char tmp;
   while (Serial2.available()) 
   {
-    ringBuff_Push( &uartRingSerial2Param, char(Serial2.read()));
+    tmp = char(Serial2.read());
+    ringBuff_Push( &uartRingSerial2Param, tmp);
+    Serial.printf("%c",tmp);
     // delay(2); //这里不能去掉，要给串口处理数据的时间
   }
 }

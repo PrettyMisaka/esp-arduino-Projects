@@ -98,7 +98,7 @@ void uartRingDebugTotalInit(void){
     cmdBuff_Push(&uartRingDebugParam, (unsigned char*)"printArray\n", printArray);
 }
 /********************Serial2 callback*********************/
-static uint16_t point_color = BLACK;
+static uint16_t point_color = RED;
 static uint16_t back_color = WHITE;
 static void setBmpSize(callBackFun_EventTypedef e){
     bmpBase.resetHeaderData(e.intData[0],e.intData[1]);
@@ -136,16 +136,20 @@ static void ss23_setIsRun(callBackFun_EventTypedef e){
     SS23_SetisRunning(e.intData[0]);
 }
 static void ss23_showAngle(callBackFun_EventTypedef e){
-    SS23_showAngle(e.intData[0],e.floatData[0]);
+    SS23_showAngle(e.intData[0],e.floatData[0],e.intData[1]);
 }
 static void ss23_topNum(callBackFun_EventTypedef e){
     SS23_showTopNum(e.stringData[0][0]);
 }
 static void ss23_route(callBackFun_EventTypedef e){
     SS23_showRoute(e.stringData[0]);
+    Serial.printf("%s\n",e.stringData[0]);
 }
 static void ss23_initNum(callBackFun_EventTypedef e){
     SS23_showInitNum(e.intData[0]);
+}
+static void ss23_initmap(callBackFun_EventTypedef e){
+    SS23_InitMap();
 }
 void uartRingSerial2TotalInit(void){
     ringBuff_Total_Init(&uartRingSerial2Param);
@@ -162,8 +166,11 @@ void uartRingSerial2TotalInit(void){
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"bmpShowString INT INT STRING\n", bmpShowString);
     // cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"\n", );
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"isRun INT\n", ss23_setIsRun);
-    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"angle INT FLOAT\n", ss23_showAngle);
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"angle INT FLOAT INT\n", ss23_showAngle);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"topNum STRING\n", ss23_topNum);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"route STRING\n", ss23_route);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"initNum INT\n", ss23_initNum);
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"initmap\n", ss23_initmap);
+    
+    cmdBuff_Push(&uartRingDebugParam, (unsigned char*)"initmap\n", ss23_initmap);
 }

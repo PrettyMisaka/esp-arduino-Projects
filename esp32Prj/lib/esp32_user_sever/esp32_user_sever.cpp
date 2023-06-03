@@ -60,7 +60,7 @@ void Web_handleUpdataImg(void){
     updata_img_index = 0;
   }
   */
-  bmpBase.printf_bmpString( 0, 80, BLACK, WHITE, 16, "count:%d",updata_img_index);
+  // bmpBase.printf_bmpString( 0, 80, BLACK, WHITE, 16, "count:%d",updata_img_index);
   updata_img_index++;
   esp32_server.send_P(200, "text/plain", (char*)bmpBase.bmp_data);
 }

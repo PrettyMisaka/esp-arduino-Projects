@@ -10,7 +10,7 @@
 #define SEPARATOR_FLAG  ' '
 #define END_FLAG        '\n'
 
-#define RING_BUFF_LENGTH 64
+#define RING_BUFF_LENGTH 256
 #define CMD_STRING_ADD_MAX_LENGTH 64
 #define CMD_STRING_SAVE_MAX_LENGTH 30
 #define CMD_BUFF_LENGTH 64
