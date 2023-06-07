@@ -151,6 +151,9 @@ static void ss23_initNum(callBackFun_EventTypedef e){
 static void ss23_initmap(callBackFun_EventTypedef e){
     SS23_InitMap();
 }
+static void ss23_init(callBackFun_EventTypedef e){
+    SS23_Init();
+}
 void uartRingSerial2TotalInit(void){
     ringBuff_Total_Init(&uartRingSerial2Param);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"pushRD INT INT INT\n", pushRaderData);
@@ -171,6 +174,7 @@ void uartRingSerial2TotalInit(void){
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"route STRING\n", ss23_route);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"initNum INT\n", ss23_initNum);
     cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"initmap\n", ss23_initmap);
+    cmdBuff_Push(&uartRingSerial2Param, (unsigned char*)"ss23init\n", ss23_init);
     
-    cmdBuff_Push(&uartRingDebugParam, (unsigned char*)"initmap\n", ss23_initmap);
+    // cmdBuff_Push(&uartRingDebugParam, (unsigned char*)"initmap\n", ss23_initmap);
 }

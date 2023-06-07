@@ -4,7 +4,7 @@ static int _SS23_state = 0;
 static int _SS23_route_cnt = 0;
 void SS23_Init(){
     SS23_ReSet();
-    SS23_SetisRunning(0);
+    SS23_SetisRunning(1);
 }
 
 void SS23_ReSet(){
@@ -48,7 +48,7 @@ void SS23_showTopNum(char _topChar){
 }
 
 void SS23_showRoute(char * _route){
-    bmpBase.clear( 0, SS23_HEIGHT - 16*4, 200, SS23_HEIGHT - 16*5, WHITE);
+    bmpBase.clear( 0, SS23_HEIGHT - 16*4, 199, SS23_HEIGHT - 16*5, WHITE);
         bmpBase.printf_bmpString( 0, SS23_HEIGHT - 16*4, BLACK, WHITE, 16, "route:%s", _route);
     // if(!_SS23_state)
     //     bmpBase.printf_bmpString( 0, SS23_HEIGHT - 16*4, BLACK, WHITE, 16, "route:", _route);
