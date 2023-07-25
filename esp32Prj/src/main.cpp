@@ -3,13 +3,14 @@
 #include "Wire.h"
 #include <SPI.h>
 
-#include "bmp_radar.h"
 #include <esp32_user_sever.h>
 #include <uart_ring_ex.h>
-#include <canvasAPI.h>
+
 #include "bmp_font.h"
 #include <bmp_23SevenSchool.h>
-// #include "MPU6050_tockn.h"
+#include "bmp_radar.h"
+#include "canvasAPI.h"
+#include "MPU6050_ex.h"
 
 const char *ssid = "ESP32-S3 WIFI";
 const char *password = "123456789";
@@ -20,9 +21,6 @@ hw_timer_t * timer = NULL;
  
 /* 创建定时器中断触发标志 */
 int FLAG_100ms_timIT = 0;
-
-TwoWire MPU6050_I2C = TwoWire(0);
-// MPU6050 mpu6050(MPU6050_I2C);
  
 // 中断服务函数，为使编译器将代码分配到IRAM内，中断处理程序应该具有 IRAM_ATTR 属性
 void IRAM_ATTR Callback_TimerIT()
@@ -38,6 +36,7 @@ void setup() {
   // pinMode(11, OUTPUT);
   WiFi.softAP(ssid,password);
   userSeverInit();
+  MPU6050_Init();
 
   Serial2.printf("444");
   Serial.print("Access Point: ");
@@ -48,13 +47,9 @@ void setup() {
   Timer_Init();
   Radar_Init();
 
-  MPU6050_I2C.begin(23, 5, 400000UL);
-  // mpu6050.begin();
-  // mpu6050.calcGyroOffsets(true);
 
   // const char* tmp;
   bmpBase.pushHeader2data();
-  Serial.printf("%d\n",((16)<<11)|((32)<<5)|(16));
   bmpBase.clear(0xfe19);
   bmpBase.drawRectangle(10,10,67,89,BLUE);
   bmpBase.drawCircle(100,100,10,RED);
@@ -82,6 +77,17 @@ void loop() {
     CoordinateAPI_Coordinate1.showCoordinate();
     sever_canvasCmdCode = CoordinateAPI_Coordinate1.canvasCmdCode;
     FLAG_100ms_timIT = 0;
+    if(1&ESP32_MPU6050_ENABLE){
+      // 角度读取
+      MPU6050_Updata();
+      // double mpu_yaw = MPU6050_getAngleZ();   // tockn的getangle，通过一阶置信计算
+      // double mpu_pitch = MPU6050_getAngleY(); // tockn的getangle，通过一阶置信计算
+      // double mpu_roll =MPU6050_getAngleX();  // tockn的getangle，通过一阶置信计算;
+      double mpu_yaw = MPU6050_getGyroAngleZ();   // tockn的getangle，通过一阶置信计算
+      double mpu_pitch = MPU6050_getGyroAngleY(); // tockn的getangle，通过一阶置信计算
+      double mpu_roll = MPU6050_getGyroAngleX();  // tockn的getangle，通过一阶置信计算;
+      Serial.printf("%lf,%lf,%lf\n",mpu_roll,mpu_pitch,mpu_yaw);
+        }
   }
 }
 
