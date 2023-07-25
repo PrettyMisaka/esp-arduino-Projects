@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include "Wire.h"
+#include <SPI.h>
 
 #include "bmp_radar.h"
 #include <esp32_user_sever.h>
@@ -7,6 +9,7 @@
 #include <canvasAPI.h>
 #include "bmp_font.h"
 #include <bmp_23SevenSchool.h>
+// #include "MPU6050_tockn.h"
 
 const char *ssid = "ESP32-S3 WIFI";
 const char *password = "123456789";
@@ -18,6 +21,8 @@ hw_timer_t * timer = NULL;
 /* 创建定时器中断触发标志 */
 int FLAG_100ms_timIT = 0;
 
+TwoWire MPU6050_I2C = TwoWire(0);
+// MPU6050 mpu6050(MPU6050_I2C);
  
 // 中断服务函数，为使编译器将代码分配到IRAM内，中断处理程序应该具有 IRAM_ATTR 属性
 void IRAM_ATTR Callback_TimerIT()
@@ -42,6 +47,10 @@ void setup() {
   uartRingSerial2TotalInit();
   Timer_Init();
   Radar_Init();
+
+  MPU6050_I2C.begin(23, 5, 400000UL);
+  // mpu6050.begin();
+  // mpu6050.calcGyroOffsets(true);
 
   // const char* tmp;
   bmpBase.pushHeader2data();
